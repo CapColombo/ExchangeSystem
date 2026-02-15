@@ -24,13 +24,13 @@ services.AddDbContextFactory<TickDbContext>(options =>
         npgsqlOptions.MigrationsAssembly(typeof(TickDbContext).Assembly.FullName);
     });
     
-    options.LogTo(Console.WriteLine, LogLevel.Information);
+    options.LogTo(Console.WriteLine, LogLevel.Warning);
 });
 
 services.AddLogging(config =>
 {
     config.AddConsole();
-    config.SetMinimumLevel(LogLevel.Information);
+    config.SetMinimumLevel(LogLevel.Trace);
 });
 
 services.AddSingleton<ITickRepository, TickRepository>();

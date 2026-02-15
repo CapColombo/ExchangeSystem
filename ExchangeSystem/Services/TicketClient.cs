@@ -5,7 +5,9 @@ using System.Text.Json;
 using ExchangeSystem.Infrastructure;
 using ExchangeSystem.Models;
 using ExchangeSystem.Services.ExchangeFactory;
+using Infrastructure;
 using Infrastructure.Services;
+using Microsoft.EntityFrameworkCore;
 using Microsoft.Extensions.Logging;
 using Factory = ExchangeSystem.Services.ExchangeFactory.ExchangeFactory;
 
@@ -19,19 +21,24 @@ internal sealed class TicketClient : ITickerClient
     private const int BaseDelayMs = 1000;
     private const int MaxDelayMs = 30000;
     
+    private readonly IDbContextFactory<TickDbContext> _dbContextFactory;
     private readonly ITickRepository _tickRepository;
     private readonly ILogger<TicketClient> _logger;
     
-    public TicketClient(ILogger<TicketClient> logger, ITickRepository tickRepository)
+    public TicketClient(
+        ILogger<TicketClient> logger, 
+        ITickRepository tickRepository, 
+        IDbContextFactory<TickDbContext> dbContextFactory)
     {
         _logger = logger;
         _tickRepository = tickRepository;
+        _dbContextFactory = dbContextFactory;
     }
     
     /// <summary>
     /// Starts socket connection
     /// </summary>
-    /// <param name="clientId">Index of dictionary</param>
+    /// <param name="clientId">Index of a collection</param>
     /// <param name="exchangeId">Broker Id</param>
     /// <param name="uri">Ticker URI</param>
     /// <param name="cancellationToken">Cancellation token</param>
@@ -43,7 +50,9 @@ internal sealed class TicketClient : ITickerClient
         ulong messagesCounterSum = 0;
         List<string> messagesBuffer = [];
         
-        var exchangeTitle = await _tickRepository.GetExchangeTitleAsync(exchangeId, cancellationToken) 
+        await using var context = await _dbContextFactory.CreateDbContextAsync(cancellationToken);
+        
+        var exchangeTitle = await _tickRepository.GetExchangeTitleAsync(context, exchangeId, cancellationToken) 
             ?? throw new Exception("Cannot get exchange title by id");
         
         var exchangeProcessor = Factory.GetExchangeProcessor(exchangeTitle);
@@ -81,7 +90,7 @@ internal sealed class TicketClient : ITickerClient
                     if (messagesCounter >= MaxMessagesCounter)
                     {
                         await ProcessMessagesAsync(
-                            exchangeId, uri, messagesBuffer, exchangeProcessor, cancellationToken);
+                            exchangeId, uri, messagesBuffer, exchangeProcessor, context, cancellationToken);
                         
                         messagesCounter = 0;
                         messagesBuffer = [];
@@ -126,6 +135,7 @@ internal sealed class TicketClient : ITickerClient
         string uri, 
         IEnumerable<string> messagesBuffer,
         IExchangeProcessor exchangeProcessor,
+        TickDbContext context,
         CancellationToken token)
     {
         var ticksJson = new ConcurrentBag<RawTickJson>();
@@ -139,6 +149,6 @@ internal sealed class TicketClient : ITickerClient
         var ticks = ticksJson.Distinct().Select(json 
             => new Tick(exchangeId, uri, JsonSerializer.Serialize(json)).ToEntity());
 
-        await _tickRepository.AddRawTicksAsync(ticks, token);
+        await _tickRepository.AddRawTicksAsync(context, ticks, token);
     }
 }
