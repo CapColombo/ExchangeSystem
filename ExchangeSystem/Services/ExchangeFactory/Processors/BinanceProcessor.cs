@@ -1,7 +1,6 @@
 ﻿using System.Globalization;
 using System.Text.Json;
 using ExchangeSystem.Models;
-using Microsoft.Extensions.Logging;
 
 namespace ExchangeSystem.Services.ExchangeFactory.Processors;
 
@@ -9,9 +8,12 @@ internal sealed class BinanceProcessor : IExchangeProcessor
 {
     public RawTickJson? ProcessMessage(string json)
     {
-        using var doc = JsonDocument.Parse(json);
+        if (string.IsNullOrEmpty(json)) 
+            throw new ArgumentNullException(nameof(json));
+        
         try
         {
+            using var doc = JsonDocument.Parse(json);
             var root = doc.RootElement;
     
             if (root.GetProperty("e").GetString() != "trade")

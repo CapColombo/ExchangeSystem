@@ -9,7 +9,6 @@ using Infrastructure;
 using Infrastructure.Services;
 using Microsoft.EntityFrameworkCore;
 using Microsoft.Extensions.Logging;
-using Factory = ExchangeSystem.Services.ExchangeFactory.ExchangeFactory;
 
 namespace ExchangeSystem.Services;
 
@@ -55,7 +54,7 @@ internal sealed class TicketClient : ITickerClient
         var exchangeTitle = await _tickRepository.GetExchangeTitleAsync(context, exchangeId, cancellationToken) 
             ?? throw new Exception("Cannot get exchange title by id");
         
-        var exchangeProcessor = Factory.GetExchangeProcessor(exchangeTitle);
+        var exchangeProcessor = ProcessorsFactory.GetExchangeProcessor(exchangeTitle);
 
         while (!cancellationToken.IsCancellationRequested && reconnectAttempts < MaxReconnectAttempts)
         {

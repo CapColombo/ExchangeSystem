@@ -1,0 +1,33 @@
+## .NET Core
+bin/
+obj/
+**/bin/**
+**/obj/**
+*.csproj.user
+*.csproj.user.*
+appsettings.Development.json
+
+## ReSharper / Rider
+*.DotSettings.user
+*.DotSettings.user.*
+*.sln.DotSettings.user
+_ReSharper.*/
+*.ReSharper
+*.ReSharper.user
+.idea/
+*.sln.iml
+
+## Visual Studio
+.vs/
+*.suo
+*.user
+*.userosscache
+*.sln.docstates
+
+## Build results
+[Dd]ebug/
+[Rr]elease/
+x64/
+build/
+[Bb]in/
+[Oo]bj/

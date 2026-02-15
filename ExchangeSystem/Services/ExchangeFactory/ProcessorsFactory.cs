@@ -2,7 +2,7 @@
 
 namespace ExchangeSystem.Services.ExchangeFactory;
 
-internal static class ExchangeFactory
+internal static class ProcessorsFactory
 {
     public static IExchangeProcessor GetExchangeProcessor(string title)
     {
