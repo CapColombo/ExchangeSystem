@@ -138,12 +138,23 @@ internal sealed class TicketClient : ITickerClient
         CancellationToken token)
     {
         var ticksJson = new ConcurrentBag<RawTickJson>();
-        
-        Parallel.ForEach(messagesBuffer, b =>
+        var semaphore = new SemaphoreSlim(Environment.ProcessorCount * 2);
+
+        var tasks = messagesBuffer.Select(async b =>
         {
-            var json = exchangeProcessor.ProcessMessage(b);
-            if (json != null) ticksJson.Add(json);
+            await semaphore.WaitAsync(token);
+            try
+            {
+                var json = await Task.Run(() => exchangeProcessor.ProcessMessage(b), token);
+                if (json != null) ticksJson.Add(json);
+            }
+            finally
+            {
+                semaphore.Release();
+            }
         });
+        
+        await Task.WhenAll(tasks);
 
         var ticks = ticksJson.Distinct().Select(json 
             => new Tick(exchangeId, uri, JsonSerializer.Serialize(json)).ToEntity());
