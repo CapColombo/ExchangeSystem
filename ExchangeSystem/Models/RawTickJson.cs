@@ -10,12 +10,11 @@ internal sealed class RawTickJson
     private bool Equals(RawTickJson other) => 
         Ticker == other.Ticker && 
         Price == other.Price && 
-        Volume == other.Volume && 
-        TimeStamp.Equals(other.TimeStamp);
+        Volume == other.Volume;
 
     public override bool Equals(object? obj) => 
         ReferenceEquals(this, obj) || obj is RawTickJson other && Equals(other);
 
     public override int GetHashCode() => 
-        HashCode.Combine(Ticker, Price, Volume, TimeStamp);
+        HashCode.Combine(Ticker, Price, Volume);
 }
