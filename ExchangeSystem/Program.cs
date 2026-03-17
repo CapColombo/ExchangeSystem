@@ -1,5 +1,6 @@
 ﻿using ExchangeSystem;
 using ExchangeSystem.Services;
+using ExchangeSystem.Services.TicketClient;
 using Infrastructure;
 using Infrastructure.Services;
 using Microsoft.EntityFrameworkCore;
@@ -24,7 +25,7 @@ services.AddDbContextFactory<TickDbContext>(options =>
         npgsqlOptions.MigrationsAssembly(typeof(TickDbContext).Assembly.FullName);
     });
     
-    options.LogTo(Console.WriteLine, LogLevel.Warning);
+    options.LogTo(Console.WriteLine, LogLevel.Error);
 });
 
 services.AddLogging(config =>
@@ -36,6 +37,7 @@ services.AddLogging(config =>
 services.AddSingleton<ITickRepository, TickRepository>();
 services.AddSingleton<IExchangeRunner, ExchangeRunner>();
 services.AddSingleton<ITickerClient, TicketClient>();
+services.AddSingleton<IConsumersGenerator, ConsumersGenerator>();
 services.AddSingleton<App>();
 
 var serviceProvider = services.BuildServiceProvider();

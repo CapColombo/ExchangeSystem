@@ -1,4 +1,5 @@
 ﻿using ExchangeSystem.Services;
+using ExchangeSystem.Services.TicketClient;
 using Infrastructure;
 using Infrastructure.Services;
 using Microsoft.EntityFrameworkCore;
@@ -18,21 +19,17 @@ public class TickerClientTests : IDisposable
     {
         var mockLogger = new Mock<ILogger<TicketClient>>();
         _mockRepository = new Mock<ITickRepository>();
-        var mockDbContextFactory = new Mock<IDbContextFactory<TickDbContext>>();
+        var mockConsumerGenerator = new Mock<IConsumersGenerator>();
             
         var options = new DbContextOptionsBuilder<TickDbContext>()
             .UseInMemoryDatabase(databaseName: Guid.NewGuid().ToString())
             .Options;
         _dbContext = new TickDbContext(options);
             
-        mockDbContextFactory
-            .Setup(f => f.CreateDbContextAsync(It.IsAny<CancellationToken>()))
-            .ReturnsAsync(_dbContext);
-            
         _client = new TicketClient(
             mockLogger.Object, 
             _mockRepository.Object,
-            mockDbContextFactory.Object);
+            mockConsumerGenerator.Object);
             
         _cts = new CancellationTokenSource();
     }
@@ -53,7 +50,6 @@ public class TickerClientTests : IDisposable
             
         _mockRepository
             .Setup(r => r.GetExchangeTitleAsync(
-                It.IsAny<TickDbContext>(),
                 exchangeId, 
                 It.IsAny<CancellationToken>()))
             .ReturnsAsync((string)null!);

@@ -9,7 +9,7 @@ internal static class Mapper
     {
         return new TickEntity
         {
-            ExchangeId = tick.ClientId,
+            ExchangeId = tick.ExchangeId,
             Source = tick.Source,
             RawJson = tick.RawJson,
             CreatedAt = tick.CreatedAt

@@ -4,15 +4,15 @@ namespace ExchangeSystem.Models;
 
 internal sealed class Tick
 {
-    public Tick(int clientId, string source, string rawJson)
+    public Tick(int exchangeId, string source, string rawJson)
     {
-        ClientId = clientId;
+        ExchangeId = exchangeId;
         Source = source;
         RawJson = rawJson;
         CreatedAt = DateTime.UtcNow;
     }
     
-    public int ClientId { get; set; }
+    public int ExchangeId { get; set; }
     public string Source { get; set; }
     public string RawJson { get; set; }
     public DateTime CreatedAt { get; set; }

@@ -1,4 +1,5 @@
 ﻿using ExchangeSystem.Services;
+using ExchangeSystem.Services.TicketClient;
 using FluentAssertions;
 using Microsoft.Extensions.Logging;
 using Moq;

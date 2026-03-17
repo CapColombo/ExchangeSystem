@@ -1,7 +1,4 @@
-using Infrastructure;
-using Microsoft.EntityFrameworkCore;
-
-namespace ExchangeSystem.Services;
+namespace ExchangeSystem.Services.TicketClient;
 
 internal interface ITickerClient
 {

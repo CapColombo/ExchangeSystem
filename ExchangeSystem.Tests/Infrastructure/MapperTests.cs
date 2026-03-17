@@ -17,7 +17,7 @@ public class MapperTests
 
         // Assert
         result.Should().NotBeNull();
-        result.ExchangeId.Should().Be(tick.ClientId);
+        result.ExchangeId.Should().Be(tick.ExchangeId);
         result.Source.Should().Be(tick.Source);
         result.RawJson.Should().Be(tick.RawJson);
         result.CreatedAt.Should().Be(tick.CreatedAt);
